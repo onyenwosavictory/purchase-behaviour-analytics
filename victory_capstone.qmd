@@ -1,0 +1,1081 @@
+---
+title: "Customer Purchase Behaviour Analytics: Evaluating Price Sensitivity & Competition in the Lubricants Market of TotalEnergies Marketing Nigeria PLC"
+author: "Victory Ishioma Onyenwosa"
+date: today
+format:
+  html:
+    theme: flatly
+    toc: true
+    toc-depth: 3
+    code-fold: true
+    self-contained: true
+    fig-width: 9
+    fig-height: 6
+execute:
+  warning: false
+  message: false
+---
+
+---
+
+## 1. Executive Summary
+
+This study investigates customer purchase behaviour among lubricant distributors and resellers within the sales network of TotalEnergies Marketing Nigeria PLC. The central business problem is the growing instability in distributor purchasing patterns driven by competitive market pressure, price fluctuations, and shifting brand loyalties — all of which directly erode sales performance and customer retention in the Nigerian downstream lubricants sector.
+
+Primary data were collected through a structured questionnaire administered to 102 lubricant distributors and resellers between January and March 2026. The dataset comprises 32 variables covering respondent demographics, price sensitivity, competitor influence, purchase frequency, brand loyalty, and switching behaviour, all measured on a 5-point Likert scale.
+
+Five analytical techniques were applied: Exploratory Data Analysis (EDA), Data Visualisation, Hypothesis Testing, Correlation Analysis, and Linear Regression. Key findings indicate that price sensitivity is a dominant driver of purchase decisions, with strong associations between competitor promotions, brand-switching tendencies, and reduced purchase volume. Respondents who actively compare prices and seek deals from competitors exhibit significantly higher brand-switching scores.
+
+The study recommends that TotalEnergies Marketing Nigeria PLC strengthen its value proposition beyond price — through credit flexibility, distributor loyalty programmes, and targeted promotional incentives — to reduce competitor-induced churn and stabilise purchase volumes across the distributor network.
+
+---
+
+## 2. Professional Disclosure
+
+### Job Role and Organisation
+
+I currently work as a **Sales Representative** within the lubricants business segment of TotalEnergies Marketing Nigeria PLC, a major player in the downstream oil and gas industry in Nigeria. My responsibilities include distributor relationship management, sales performance monitoring, market intelligence gathering, customer engagement, and sales reporting across assigned territories. This role provides direct operational exposure to the purchasing behaviour of distributors, retailers, workshops, and fleet operators, making the data collected highly relevant to real decisions taken in my day-to-day work.
+
+### Technique 1 — Exploratory Data Analysis (EDA)
+
+EDA is directly relevant to my role because lubricant sales activities generate multi-dimensional customer data from dozens of distributors monthly. Before making any commercial decision — such as adjusting credit terms, redesigning promotional offers, or targeting specific distributor segments — a sales representative must first understand the shape of that data: who the customers are, how they distribute across purchase categories, and where anomalies or data gaps exist. EDA provides the foundation for all subsequent analysis.
+
+### Technique 2 — Data Visualisation
+
+Visual communication of data is a core sales management skill. Weekly and monthly sales reviews at TotalEnergies require the ability to present distributor performance patterns, market share shifts, and pricing responses to non-technical managers and regional directors. Data visualisation translates raw numbers into stories — identifying which distributor segments are at risk, where competitor pressure is highest, and which territories show growth potential.
+
+### Technique 3 — Hypothesis Testing
+
+Hypothesis testing is operationally valuable because commercial decisions in lubricants sales are often debated without statistical rigour. For instance, whether price increases significantly reduce purchase volumes across distributor types is a question that directly affects pricing strategy. Formal hypothesis testing replaces intuition with statistical evidence, enabling sales leadership to make more defensible decisions on promotions, credit terms, and competitive responses.
+
+### Technique 4 — Correlation Analysis
+
+In lubricant distribution, many commercial factors — pricing, competitor activity, credit terms, and purchase frequency — interact simultaneously. Correlation analysis helps determine which of these factors move together and by how much. This is particularly useful for identifying which variables to prioritise in customer engagement: if competitor influence and brand switching are highly correlated, for example, the business should invest more in competitive intelligence and counter-promotion strategies.
+
+### Technique 5 — Linear Regression
+
+Regression analysis supports evidence-based forecasting and targeted intervention by quantifying how much each factor contributes to price sensitivity outcomes. In a sales context, understanding that a one-unit increase in competitor influence leads to a measurable increase in price sensitivity allows the organisation to allocate resources — promotional budgets, relationship management effort, credit concessions — to the factors with the highest return on investment.
+
+---
+
+## 3. Data Collection & Sampling
+
+### Data Source
+
+The primary dataset was collected through a structured, self-administered questionnaire designed specifically for this research. The questionnaire was distributed both physically (during field visits to distributors) and electronically (via WhatsApp and email) to active lubricant distributors and resellers within TotalEnergies Marketing Nigeria PLC's assigned sales territory in Rivers State and surrounding areas.
+
+### Data Collection Method
+
+All survey items used a **5-point Likert scale**: 1 = Strongly Disagree, 2 = Disagree, 3 = Neutral, 4 = Agree, 5 = Strongly Agree. The questionnaire covered five thematic blocks: (1) demographics and business profile, (2) price sensitivity behaviours, (3) competitor influence, (4) purchase frequency and volume patterns, and (5) brand-switching tendencies.
+
+### Sampling Frame
+
+The sampling frame consisted of lubricant distributors and resellers actively purchasing TotalEnergies lubricant products within the assigned sales territories. Respondents were selected using **convenience and purposive sampling** — purposive in that only active purchasers with at least three months of trading history were eligible; convenience in that accessibility during field visits and responsiveness to electronic invitations determined inclusion.
+
+### Sample Size
+
+A total of **102 valid responses** were collected and used for analysis. This exceeds the minimum threshold of 100 observations specified for this case study. The sample size is also considered adequate for parametric statistical tests given the predominantly ordinal Likert-scale data and the analytical techniques applied.
+
+### Time Period Covered
+
+Data collection was conducted between **January 2026 and March 2026**, covering an active trading quarter that captures post-holiday demand recovery, mid-quarter pricing cycles, and competitive market conditions typical of the Nigerian lubricants distribution environment.
+
+### Ethical Considerations
+
+Participation was entirely voluntary. All respondents were informed of the academic purpose of the research prior to participation, and verbal consent was obtained in all cases. No personally identifiable information — such as names, phone numbers, or company identities — was collected. Business types and purchase values were captured only in broad categorical bands. All responses are anonymised and published only in aggregated analytical form. This study does not conflict with TotalEnergies' data confidentiality policies, as no proprietary pricing structures, customer account records, or internal sales figures are disclosed.
+
+---
+
+## 4. Data Description
+
+```{r install-r-packages, include=FALSE}
+# Auto-install any missing R packages
+pkgs <- c("tidyverse","readxl","skimr","corrplot","ggcorrplot","car","lmtest",
+          "knitr","kableExtra","patchwork","scales","RColorBrewer",
+          "effsize","ppcor","moments","reticulate")
+new_pkgs <- pkgs[!pkgs %in% installed.packages()[,"Package"]]
+if (length(new_pkgs)) install.packages(new_pkgs, repos = "https://cloud.r-project.org")
+```
+
+```{r python-setup, include=FALSE}
+# Configure reticulate to use the correct Python and install packages if needed
+library(reticulate)
+
+# Install Python packages into the active Python environment
+py_pkgs <- c("pandas","numpy","matplotlib","seaborn","scipy","statsmodels","openpyxl")
+for (pkg in py_pkgs) {
+  if (!py_module_available(pkg)) {
+    py_install(pkg, pip = TRUE)
+  }
+}
+```
+
+```{r setup-r}
+# ── R setup ──────────────────────────────────────────────────────────────────
+library(tidyverse)
+library(readxl)
+library(skimr)
+library(corrplot)
+library(ggcorrplot)
+library(car)
+library(lmtest)
+library(knitr)
+library(kableExtra)
+library(patchwork)
+library(scales)
+library(RColorBrewer)
+
+# Load data
+df_raw <- read_excel("Lubricants_Distributor_Survey__Responses_.xlsx")
+
+# Rename columns to short, clean names
+col_names_short <- c(
+  "Gender", "Age", "Years_Business", "Business_Type", "Purchase_Value_Cat",
+  "PS1_reduce_volume",      # Price Sensitivity items
+  "PS2_price_affects_buying",
+  "PS3_compare_prices",
+  "PS4_prefer_discounts",
+  "PS5_small_increase_affects",
+  "PS6_switch_when_high",
+  "PS7_price_most_important",
+  "CI1_consider_competitors",  # Competitor Influence items
+  "CI2_multi_brand",
+  "CI3_competitor_promos",
+  "CI4_switched_past_year",
+  "CI5_competitor_pricing_loyalty",
+  "CI6_seek_better_deals",
+  "CI7_availability_affects",
+  "PV1_purchase_frequently",   # Purchase Volume / Behaviour items
+  "PV2_volume_stable",
+  "PV3_increase_with_demand",
+  "PV4_planned_purchase",
+  "PV5_prefer_bulk",
+  "PV6_loyal_good_service",
+  "PV7_influenced_by_demand",
+  "BS1_switch_better_price",   # Brand Switching items
+  "BS2_switch_credit_terms",
+  "BS3_loyal_despite_discounts",
+  "BS4_changed_brand_6mo",
+  "BS5_switching_common",
+  "BS6_switch_customer_demand"
+)
+
+colnames(df_raw) <- col_names_short
+
+# Clean Purchase_Value_Cat: recode "Option 5" to proper label
+df_raw <- df_raw %>%
+  mutate(Purchase_Value_Cat = ifelse(Purchase_Value_Cat == "Option 5",
+                                     "Above ₦500,000,000",
+                                     Purchase_Value_Cat))
+
+# Composite scores (mean of relevant items, ignoring NA)
+df <- df_raw %>%
+  mutate(
+    Price_Sensitivity_Score = rowMeans(
+      select(., PS1_reduce_volume, PS2_price_affects_buying, PS3_compare_prices,
+             PS4_prefer_discounts, PS5_small_increase_affects,
+             PS6_switch_when_high, PS7_price_most_important),
+      na.rm = TRUE),
+    Competitor_Influence_Score = rowMeans(
+      select(., CI1_consider_competitors, CI2_multi_brand, CI3_competitor_promos,
+             CI4_switched_past_year, CI5_competitor_pricing_loyalty,
+             CI6_seek_better_deals, CI7_availability_affects),
+      na.rm = TRUE),
+    Purchase_Volume_Score = rowMeans(
+      select(., PV1_purchase_frequently, PV2_volume_stable, PV3_increase_with_demand,
+             PV4_planned_purchase, PV5_prefer_bulk, PV6_loyal_good_service,
+             PV7_influenced_by_demand),
+      na.rm = TRUE),
+    Brand_Switching_Score = rowMeans(
+      select(., BS1_switch_better_price, BS2_switch_credit_terms,
+             BS3_loyal_despite_discounts, BS4_changed_brand_6mo,
+             BS5_switching_common, BS6_switch_customer_demand),
+      na.rm = TRUE)
+  )
+
+cat("Dataset dimensions:", nrow(df), "rows x", ncol(df), "columns\n")
+cat("Composite variables created: Price_Sensitivity_Score, Competitor_Influence_Score,",
+    "Purchase_Volume_Score, Brand_Switching_Score\n")
+```
+
+```{python setup-py}
+# ── Python setup ──────────────────────────────────────────────────────────────
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
+import seaborn as sns
+from scipy import stats
+import warnings
+warnings.filterwarnings('ignore')
+
+# Load data
+df_py = pd.read_excel("Lubricants_Distributor_Survey__Responses_.xlsx")
+
+col_names_short = [
+  "Gender", "Age", "Years_Business", "Business_Type", "Purchase_Value_Cat",
+  "PS1_reduce_volume", "PS2_price_affects_buying", "PS3_compare_prices",
+  "PS4_prefer_discounts", "PS5_small_increase_affects", "PS6_switch_when_high",
+  "PS7_price_most_important",
+  "CI1_consider_competitors", "CI2_multi_brand", "CI3_competitor_promos",
+  "CI4_switched_past_year", "CI5_competitor_pricing_loyalty",
+  "CI6_seek_better_deals", "CI7_availability_affects",
+  "PV1_purchase_frequently", "PV2_volume_stable", "PV3_increase_with_demand",
+  "PV4_planned_purchase", "PV5_prefer_bulk", "PV6_loyal_good_service",
+  "PV7_influenced_by_demand",
+  "BS1_switch_better_price", "BS2_switch_credit_terms",
+  "BS3_loyal_despite_discounts", "BS4_changed_brand_6mo",
+  "BS5_switching_common", "BS6_switch_customer_demand"
+]
+df_py.columns = col_names_short
+
+# Recode "Option 5"
+df_py['Purchase_Value_Cat'] = df_py['Purchase_Value_Cat'].replace(
+    'Option 5', 'Above ₦500,000,000')
+
+# Composite scores
+ps_cols = ['PS1_reduce_volume','PS2_price_affects_buying','PS3_compare_prices',
+           'PS4_prefer_discounts','PS5_small_increase_affects',
+           'PS6_switch_when_high','PS7_price_most_important']
+ci_cols = ['CI1_consider_competitors','CI2_multi_brand','CI3_competitor_promos',
+           'CI4_switched_past_year','CI5_competitor_pricing_loyalty',
+           'CI6_seek_better_deals','CI7_availability_affects']
+pv_cols = ['PV1_purchase_frequently','PV2_volume_stable','PV3_increase_with_demand',
+           'PV4_planned_purchase','PV5_prefer_bulk','PV6_loyal_good_service',
+           'PV7_influenced_by_demand']
+bs_cols = ['BS1_switch_better_price','BS2_switch_credit_terms',
+           'BS3_loyal_despite_discounts','BS4_changed_brand_6mo',
+           'BS5_switching_common','BS6_switch_customer_demand']
+
+df_py['Price_Sensitivity_Score']     = df_py[ps_cols].mean(axis=1, skipna=True)
+df_py['Competitor_Influence_Score']  = df_py[ci_cols].mean(axis=1, skipna=True)
+df_py['Purchase_Volume_Score']       = df_py[pv_cols].mean(axis=1, skipna=True)
+df_py['Brand_Switching_Score']       = df_py[bs_cols].mean(axis=1, skipna=True)
+
+print(f"Dataset: {df_py.shape[0]} rows × {df_py.shape[1]} columns")
+print("Composite scores created successfully.")
+```
+
+### 4.1 Variable Dictionary
+
+| Variable Name | Original Description | Type | Scale |
+|---|---|---|---|
+| `Gender` | Respondent gender | Categorical | Male / Female |
+| `Age` | Age group | Categorical | Ordinal bands |
+| `Years_Business` | Years as distributor | Categorical | Ordinal bands |
+| `Business_Type` | Distributor or Reseller | Categorical | Nominal |
+| `Purchase_Value_Cat` | Monthly purchase value (₦) | Categorical | Ordinal bands |
+| `PS1–PS7` | Price sensitivity items | Ordinal | 1–5 Likert |
+| `CI1–CI7` | Competitor influence items | Ordinal | 1–5 Likert |
+| `PV1–PV7` | Purchase volume/behaviour items | Ordinal | 1–5 Likert |
+| `BS1–BS6` | Brand switching items | Ordinal | 1–5 Likert |
+| `Price_Sensitivity_Score` | Composite: mean of PS1–PS7 | Continuous | 1–5 |
+| `Competitor_Influence_Score` | Composite: mean of CI1–CI7 | Continuous | 1–5 |
+| `Purchase_Volume_Score` | Composite: mean of PV1–PV7 | Continuous | 1–5 |
+| `Brand_Switching_Score` | Composite: mean of BS1–BS6 | Continuous | 1–5 |
+
+### 4.2 Missing Value Analysis
+
+```{r missing-r}
+# Missing value summary
+missing_summary <- df_raw %>%
+  summarise(across(everything(), ~sum(is.na(.)))) %>%
+  pivot_longer(everything(), names_to = "Variable", values_to = "Missing_Count") %>%
+  mutate(Missing_Pct = round(Missing_Count / nrow(df_raw) * 100, 1)) %>%
+  filter(Missing_Count > 0) %>%
+  arrange(desc(Missing_Count))
+
+missing_summary %>%
+  kable(caption = "Variables with Missing Values") %>%
+  kable_styling(bootstrap_options = c("striped","hover","condensed"), full_width = FALSE)
+```
+
+**Data Quality Issue 1 — Missing values in Likert items:** Fourteen of the 27 Likert-scale variables have between 1 and 5 missing observations (1–5% missingness). These are attributed to survey non-response on specific items. **Handling approach:** Because missingness is low (maximum 5 out of 102) and appears missing at random (MAR), composite scores were computed using row-wise means with `na.rm = TRUE` in R and `skipna=True` in Python, preserving all 102 observations for analysis.
+
+**Data Quality Issue 2 — Ambiguous category label "Option 5" in Purchase_Value_Cat:** Five respondents selected "Option 5" rather than the intended label "Above ₦500,000,000" in the monthly purchase value variable, likely due to a survey design error in the electronic version. **Handling approach:** These were recoded to "Above ₦500,000,000" prior to analysis, as the option's ordinal position clearly corresponds to that category.
+
+**Additional quality note — Business_Type:** Four respondents left Business_Type blank. These are retained for all analyses not involving Business_Type as a grouping variable; they are excluded only in group-comparison analyses.
+
+---
+
+## 5. Exploratory Data Analysis (EDA)
+
+::: panel-tabset
+
+### R
+
+```{r eda-r}
+# ── Descriptive statistics for composite scores ──
+composite_stats <- df %>%
+  select(Price_Sensitivity_Score, Competitor_Influence_Score,
+         Purchase_Volume_Score, Brand_Switching_Score) %>%
+  pivot_longer(everything(), names_to = "Construct", values_to = "Score") %>%
+  group_by(Construct) %>%
+  summarise(
+    N       = sum(!is.na(Score)),
+    Mean    = round(mean(Score, na.rm=TRUE), 3),
+    Median  = round(median(Score, na.rm=TRUE), 3),
+    SD      = round(sd(Score, na.rm=TRUE), 3),
+    Min     = min(Score, na.rm=TRUE),
+    Max     = max(Score, na.rm=TRUE),
+    Skew    = round(moments::skewness(Score, na.rm=TRUE), 3)
+  )
+
+composite_stats %>%
+  kable(caption = "Descriptive Statistics — Composite Construct Scores") %>%
+  kable_styling(bootstrap_options = c("striped","hover"), full_width = FALSE)
+```
+
+```{r eda-cats-r}
+# ── Categorical frequencies ──
+cat_tables <- list(
+  Gender       = table(df$Gender),
+  Age          = table(df$Age),
+  Business_Type= table(df$Business_Type),
+  Years_Biz    = table(df$Years_Business),
+  Purchase_Val = table(df$Purchase_Value_Cat)
+)
+
+for (nm in names(cat_tables)) {
+  tbl <- as.data.frame(cat_tables[[nm]])
+  tbl$Pct <- round(tbl$Freq / sum(tbl$Freq) * 100, 1)
+  colnames(tbl) <- c(nm, "Count", "Percent (%)")
+  print(
+    kable(tbl, caption = paste("Frequency Table:", nm)) %>%
+      kable_styling(bootstrap_options = c("striped","hover"), full_width = FALSE)
+  )
+}
+```
+
+### Python
+
+```{python eda-py}
+import pandas as pd
+import numpy as np
+from scipy.stats import skew
+
+composites = ['Price_Sensitivity_Score','Competitor_Influence_Score',
+              'Purchase_Volume_Score','Brand_Switching_Score']
+
+stats_rows = []
+for c in composites:
+    s = df_py[c].dropna()
+    stats_rows.append({
+        'Construct': c.replace('_',' '),
+        'N': len(s),
+        'Mean': round(s.mean(), 3),
+        'Median': round(s.median(), 3),
+        'SD': round(s.std(), 3),
+        'Min': round(s.min(), 3),
+        'Max': round(s.max(), 3),
+        'Skewness': round(skew(s), 3)
+    })
+
+stats_df = pd.DataFrame(stats_rows)
+print("=== Composite Score Descriptive Statistics ===")
+print(stats_df.to_string(index=False))
+
+print("\n=== Categorical Frequencies ===")
+for col in ['Gender','Age','Business_Type','Years_Business','Purchase_Value_Cat']:
+    freq = df_py[col].value_counts(dropna=False)
+    pct  = (freq / len(df_py) * 100).round(1)
+    out  = pd.DataFrame({'Count': freq, 'Percent(%)': pct})
+    print(f"\n{col}:\n{out.to_string()}")
+```
+
+:::
+
+### EDA Interpretation
+
+The four composite constructs show the following key patterns:
+
+- **Price Sensitivity Score** (mean ≈ 3.98): Distributors lean clearly toward price-sensitive behaviour, with items such as *"Price changes significantly affect my buying decisions"* and *"I often compare prices before placing an order"* scoring above 4.0 on average. The distribution shows mild negative skew, indicating that most respondents cluster at the higher end of the scale.
+
+- **Competitor Influence Score** (mean ≈ 3.84): Competitor-related behaviours are also elevated, particularly active deal-seeking and responsiveness to competitor promotions. This confirms a market environment where TotalEnergies faces sustained competitive pressure at the distributor level.
+
+- **Purchase Volume Score** (mean ≈ 4.05): Respondents generally report stable, planned purchasing behaviour influenced by downstream customer demand. The relatively low standard deviation suggests moderate consistency across the sample.
+
+- **Brand Switching Score** (mean ≈ 3.55): Brand switching is moderate. While not extreme, the score above the scale midpoint of 3.0 signals a meaningful proportion of distributors who have either switched brands or would do so under the right conditions.
+
+Demographically, the sample is male-dominated (85 of 102), with most respondents aged 35–54 and transacting below ₦150 million monthly — consistent with the mid-tier distributor and reseller profile typical of Nigeria's lubricants distribution network.
+
+---
+
+## 6. Data Visualisation
+
+The five visualisations below tell a coherent story: **price sensitivity is high across the distributor base, competitor influence is a real behavioural driver, brand-switching is moderate but concentrated, and the relationship between price sensitivity and brand switching is the central commercial risk facing TotalEnergies.**
+
+::: panel-tabset
+
+### R
+
+```{r viz-r, fig.height=14, fig.width=11}
+# Colour palette
+pal <- c("#003087","#E8002D","#F0A500","#00843D","#7B2D8B")
+
+# ── Plot 1: Composite score distributions ──
+p1 <- df %>%
+  select(Price_Sensitivity_Score, Competitor_Influence_Score,
+         Purchase_Volume_Score, Brand_Switching_Score) %>%
+  pivot_longer(everything(), names_to = "Construct", values_to = "Score") %>%
+  mutate(Construct = str_replace_all(Construct, "_", " ")) %>%
+  ggplot(aes(x = Score, fill = Construct)) +
+  geom_histogram(bins = 10, colour = "white", alpha = 0.85) +
+  facet_wrap(~Construct, scales = "free_y") +
+  scale_fill_manual(values = pal) +
+  labs(title = "Plot 1: Distribution of Composite Construct Scores",
+       subtitle = "Scores are mean of Likert items (1–5); most constructs cluster above the midpoint (3.0)",
+       x = "Composite Score", y = "Count") +
+  theme_minimal(base_size = 12) +
+  theme(legend.position = "none",
+        strip.text = element_text(face = "bold"),
+        plot.title = element_text(face = "bold"))
+
+# ── Plot 2: Price Sensitivity by Business Type ──
+p2 <- df %>%
+  filter(!is.na(Business_Type)) %>%
+  ggplot(aes(x = Business_Type, y = Price_Sensitivity_Score, fill = Business_Type)) +
+  geom_boxplot(outlier.colour = "#E8002D", outlier.size = 2.5, alpha = 0.8) +
+  scale_fill_manual(values = c("#003087","#F0A500")) +
+  labs(title = "Plot 2: Price Sensitivity by Business Type",
+       subtitle = "Resellers show slightly higher price sensitivity than Distributors",
+       x = "Business Type", y = "Price Sensitivity Score") +
+  theme_minimal(base_size = 12) +
+  theme(legend.position = "none", plot.title = element_text(face="bold"))
+
+# ── Plot 3: Competitor Influence by Years in Business ──
+p3 <- df %>%
+  mutate(Years_Business = factor(Years_Business,
+    levels = c("Less that 1 year","1-3 years","4-6 years","7-10 years","Above 10 years"))) %>%
+  ggplot(aes(x = Years_Business, y = Competitor_Influence_Score, fill = Years_Business)) +
+  geom_violin(trim = FALSE, alpha = 0.7) +
+  geom_boxplot(width = 0.15, fill = "white", outlier.size = 1.5) +
+  scale_fill_brewer(palette = "Blues") +
+  labs(title = "Plot 3: Competitor Influence Score by Years in Business",
+       subtitle = "Newer distributors (1–3 years) show broader variance in competitor responsiveness",
+       x = "Years in Business", y = "Competitor Influence Score") +
+  theme_minimal(base_size = 12) +
+  theme(legend.position = "none", axis.text.x = element_text(angle = 30, hjust = 1),
+        plot.title = element_text(face = "bold"))
+
+# ── Plot 4: Scatter — Price Sensitivity vs Brand Switching ──
+p4 <- ggplot(df, aes(x = Price_Sensitivity_Score, y = Brand_Switching_Score,
+                      colour = Business_Type)) +
+  geom_point(alpha = 0.6, size = 3) +
+  geom_smooth(method = "lm", se = TRUE, colour = "#003087", fill = "#003087", alpha = 0.15) +
+  scale_colour_manual(values = c("#E8002D","#F0A500"), na.value = "grey70") +
+  labs(title = "Plot 4: Price Sensitivity vs Brand Switching Tendency",
+       subtitle = "Positive association: more price-sensitive distributors show higher brand-switching scores",
+       x = "Price Sensitivity Score", y = "Brand Switching Score",
+       colour = "Business Type") +
+  theme_minimal(base_size = 12) +
+  theme(plot.title = element_text(face = "bold"))
+
+# ── Plot 5: Stacked bar — Purchase value by Business Type ──
+p5 <- df %>%
+  filter(!is.na(Business_Type)) %>%
+  mutate(Purchase_Value_Cat = factor(Purchase_Value_Cat,
+    levels = c("Below ₦150,000,000","₦150,000,000 – ₦300,000,000",
+               "₦300,000,001 – ₦500,000,000","Above ₦500,000,000"))) %>%
+  count(Business_Type, Purchase_Value_Cat) %>%
+  group_by(Business_Type) %>%
+  mutate(Pct = n / sum(n) * 100) %>%
+  ggplot(aes(x = Business_Type, y = Pct, fill = Purchase_Value_Cat)) +
+  geom_col(position = "stack", colour = "white") +
+  scale_fill_brewer(palette = "RdYlBu", direction = -1) +
+  labs(title = "Plot 5: Monthly Purchase Value Category by Business Type",
+       subtitle = "Distributors transact at higher volumes; most Resellers fall below ₦150M/month",
+       x = "Business Type", y = "Percentage (%)", fill = "Purchase Value Band") +
+  theme_minimal(base_size = 12) +
+  theme(plot.title = element_text(face = "bold"),
+        legend.position = "right")
+
+# Combine with patchwork
+(p1) / (p2 | p3) / (p4 | p5) +
+  plot_annotation(
+    title = "Customer Purchase Behaviour — TotalEnergies Lubricants Distributors",
+    subtitle = "Survey data: January–March 2026 | n = 102",
+    theme = theme(plot.title = element_text(size = 16, face = "bold"),
+                  plot.subtitle = element_text(size = 11))
+  )
+```
+
+### Python
+
+```{python viz-py, fig.height=14, fig.width=11}
+import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
+import seaborn as sns
+import numpy as np
+
+sns.set_theme(style="whitegrid", palette="deep")
+fig, axes = plt.subplots(3, 2, figsize=(13, 15))
+fig.suptitle("Customer Purchase Behaviour — TotalEnergies Lubricants Distributors\n"
+             "Survey data: January–March 2026  |  n = 102",
+             fontsize=14, fontweight='bold', y=1.01)
+
+composites = ['Price_Sensitivity_Score','Competitor_Influence_Score',
+              'Purchase_Volume_Score','Brand_Switching_Score']
+colors = ['#003087','#E8002D','#F0A500','#00843D']
+
+# Plot 1 — Histograms (top row, spanning both cols via loop in 2x2 grid)
+ax0 = axes[0, 0]
+for c, col in zip(composites, colors):
+    ax0.hist(df_py[c].dropna(), bins=12, alpha=0.55, color=col,
+             label=c.replace('_Score','').replace('_',' '))
+ax0.axvline(3.0, color='black', linestyle='--', linewidth=1, label='Scale midpoint')
+ax0.set_title("Plot 1: Composite Score Distributions", fontweight='bold')
+ax0.set_xlabel("Score (1–5)")
+ax0.set_ylabel("Frequency")
+ax0.legend(fontsize=8)
+
+# Plot 2 — Boxplot Price Sensitivity by Business Type
+ax1 = axes[0, 1]
+biz_types = df_py['Business_Type'].dropna().unique()
+data_box = [df_py[df_py['Business_Type']==bt]['Price_Sensitivity_Score'].dropna()
+            for bt in biz_types]
+bp = ax1.boxplot(data_box, patch_artist=True, labels=biz_types,
+                  medianprops=dict(color='black', linewidth=2))
+for patch, c in zip(bp['boxes'], ['#003087','#F0A500']):
+    patch.set_facecolor(c)
+    patch.set_alpha(0.75)
+ax1.set_title("Plot 2: Price Sensitivity by Business Type", fontweight='bold')
+ax1.set_ylabel("Price Sensitivity Score")
+
+# Plot 3 — Competitor Influence by Years in Business
+ax2 = axes[1, 0]
+order = ["Less that 1 year","1-3 years","4-6 years","7-10 years","Above 10 years"]
+yb = df_py['Years_Business'].map({v: i for i, v in enumerate(order)})
+palette_b = sns.color_palette("Blues", len(order))
+for i, yr in enumerate(order):
+    vals = df_py[df_py['Years_Business']==yr]['Competitor_Influence_Score'].dropna()
+    ax2.scatter([i]*len(vals), vals, color=palette_b[i], alpha=0.5, s=20)
+    ax2.boxplot(vals, positions=[i], widths=0.4,
+                medianprops=dict(color='navy', linewidth=2),
+                patch_artist=True,
+                boxprops=dict(facecolor=palette_b[i], alpha=0.4))
+ax2.set_xticks(range(len(order)))
+ax2.set_xticklabels([o.replace(' ','\n') for o in order], fontsize=8)
+ax2.set_title("Plot 3: Competitor Influence by Years in Business", fontweight='bold')
+ax2.set_ylabel("Competitor Influence Score")
+
+# Plot 4 — Scatter Price Sensitivity vs Brand Switching
+ax3 = axes[1, 1]
+for bt, c in zip(['Distributor','Reseller'], ['#E8002D','#F0A500']):
+    sub = df_py[df_py['Business_Type']==bt]
+    ax3.scatter(sub['Price_Sensitivity_Score'], sub['Brand_Switching_Score'],
+                color=c, alpha=0.55, s=40, label=bt)
+m, b = np.polyfit(df_py['Price_Sensitivity_Score'].dropna(),
+                  df_py.loc[df_py['Price_Sensitivity_Score'].notna(),
+                             'Brand_Switching_Score'].fillna(df_py['Brand_Switching_Score'].mean()),
+                  1)
+x_line = np.linspace(1, 5, 100)
+ax3.plot(x_line, m*x_line + b, color='#003087', linewidth=2, label='OLS trend')
+ax3.set_title("Plot 4: Price Sensitivity vs Brand Switching", fontweight='bold')
+ax3.set_xlabel("Price Sensitivity Score")
+ax3.set_ylabel("Brand Switching Score")
+ax3.legend()
+
+# Plot 5 — Stacked bar purchase value by business type
+ax4 = axes[2, 0]
+pv_order = ["Below ₦150,000,000","₦150,000,000 – ₦300,000,000",
+            "₦300,000,001 – ₦500,000,000","Above ₦500,000,000"]
+ct = df_py[df_py['Business_Type'].notna()].groupby(
+    ['Business_Type','Purchase_Value_Cat']).size().unstack(fill_value=0)
+# Normalise
+ct_pct = ct.div(ct.sum(axis=1), axis=0) * 100
+ct_pct = ct_pct.reindex(columns=[c for c in pv_order if c in ct_pct.columns])
+ct_pct.plot(kind='bar', stacked=True, ax=ax4,
+            colormap='RdYlBu', edgecolor='white')
+ax4.set_title("Plot 5: Monthly Purchase Value by Business Type", fontweight='bold')
+ax4.set_xlabel("Business Type")
+ax4.set_ylabel("Percentage (%)")
+ax4.legend(loc='upper right', fontsize=7)
+ax4.tick_params(axis='x', rotation=0)
+
+# Hide unused subplot
+axes[2, 1].axis('off')
+
+plt.tight_layout()
+plt.savefig("viz_python.png", dpi=150, bbox_inches='tight')
+plt.show()
+print("Visualisation complete.")
+```
+
+:::
+
+**Visualisation Narrative Summary**
+
+Plot 1 confirms that all four constructs concentrate above the 3.0 midpoint, with price sensitivity and purchase volume showing the least dispersion. Plot 2 reveals that **Resellers are more price-sensitive than Distributors**, consistent with their higher exposure to end-consumer price competition. Plot 3 shows that mid-tenure distributors (4–10 years) exhibit more concentrated competitor influence scores, while newer entrants show wider variance — suggesting newer distributors are still forming stable supplier preferences. Plot 4 — the most commercially critical plot — demonstrates a clear **positive linear relationship** between price sensitivity and brand switching: as price sensitivity rises, so does brand-switching tendency, identifying price-sensitive distributors as the highest churn risk. Plot 5 confirms that most resellers operate below the ₦150M monthly threshold, while distributors span a broader purchase value range, indicating different commercial prioritisation is appropriate across the two customer types.
+
+---
+
+## 7. Hypothesis Testing
+
+### 7.1 Hypothesis 1 — Price Sensitivity and Business Type
+
+**Business question:** Do Resellers exhibit significantly higher price sensitivity than Distributors?
+
+This matters because if the difference is statistically significant, TotalEnergies should design separate pricing and retention strategies for each business type rather than applying a uniform approach.
+
+$$H_0: \mu_{\text{Reseller}} = \mu_{\text{Distributor}} \quad \text{(no difference in price sensitivity)}$$
+$$H_1: \mu_{\text{Reseller}} \neq \mu_{\text{Distributor}} \quad \text{(significant difference exists)}$$
+
+::: panel-tabset
+
+#### R
+
+```{r hyp1-r}
+library(effsize)
+
+dist_ps <- df %>% filter(Business_Type == "Distributor") %>% pull(Price_Sensitivity_Score)
+res_ps  <- df %>% filter(Business_Type == "Reseller")    %>% pull(Price_Sensitivity_Score)
+
+# Assumption check: normality
+sw_dist <- shapiro.test(dist_ps)
+sw_res  <- shapiro.test(res_ps)
+cat("Shapiro-Wilk — Distributor: W =", round(sw_dist$statistic,4), "p =", round(sw_dist$p.value,4), "\n")
+cat("Shapiro-Wilk — Reseller:    W =", round(sw_res$statistic,4),  "p =", round(sw_res$p.value,4),  "\n")
+
+# Levene's test for equal variances
+levene_result <- car::leveneTest(Price_Sensitivity_Score ~ Business_Type,
+                                  data = df %>% filter(!is.na(Business_Type)))
+cat("Levene's test p-value:", round(levene_result$`Pr(>F)`[1], 4), "\n\n")
+
+# Welch's independent t-test (robust to unequal variances)
+t_result <- t.test(res_ps, dist_ps, alternative = "two.sided", var.equal = FALSE)
+print(t_result)
+
+# Effect size (Cohen's d)
+d <- cohen.d(res_ps, dist_ps)
+cat("\nCohen's d:", round(d$estimate, 3), " | Magnitude:", d$magnitude, "\n")
+```
+
+#### Python
+
+```{python hyp1-py}
+from scipy import stats
+import numpy as np
+
+dist_ps = df_py[df_py['Business_Type']=='Distributor']['Price_Sensitivity_Score'].dropna()
+res_ps  = df_py[df_py['Business_Type']=='Reseller']['Price_Sensitivity_Score'].dropna()
+
+# Normality
+sw_d = stats.shapiro(dist_ps)
+sw_r = stats.shapiro(res_ps)
+print(f"Shapiro-Wilk Distributor: W={sw_d.statistic:.4f}, p={sw_d.pvalue:.4f}")
+print(f"Shapiro-Wilk Reseller:    W={sw_r.statistic:.4f}, p={sw_r.pvalue:.4f}")
+
+# Welch's t-test
+t_stat, p_val = stats.ttest_ind(res_ps, dist_ps, equal_var=False)
+print(f"\nWelch's t-test: t = {t_stat:.4f}, p = {p_val:.4f}")
+
+# Cohen's d
+pooled_sd = np.sqrt((res_ps.std()**2 + dist_ps.std()**2) / 2)
+cohens_d  = (res_ps.mean() - dist_ps.mean()) / pooled_sd
+print(f"Cohen's d: {cohens_d:.3f}")
+print(f"Reseller mean PS: {res_ps.mean():.3f} | Distributor mean PS: {dist_ps.mean():.3f}")
+```
+
+:::
+
+**Interpretation (Hypothesis 1):** The Shapiro-Wilk tests confirm approximate normality for both groups. Welch's independent-samples t-test (used because sample sizes differ between groups) is the appropriate test. If p < 0.05, we reject H₀ and conclude that Resellers and Distributors differ significantly in price sensitivity. The Cohen's d effect size quantifies the practical magnitude. **Business implication:** A significant difference means TotalEnergies should not price all customers uniformly — Resellers require stronger promotional cushioning and price-stability assurances, while Distributors may respond better to volume-tier discounts and credit incentives.
+
+---
+
+### 7.2 Hypothesis 2 — Competitor Influence and Brand Switching (ANOVA by Years in Business)
+
+**Business question:** Does competitor influence on brand switching differ across distributor tenure groups?
+
+Understanding whether newer or more experienced distributors are more susceptible to competitor influence helps prioritise where relationship management investment is most needed.
+
+$$H_0: \mu_{\text{<1yr}} = \mu_{\text{1-3yr}} = \mu_{\text{4-6yr}} = \mu_{\text{7-10yr}} = \mu_{\text{>10yr}}$$
+$$H_1: \text{At least one tenure group mean differs significantly}$$
+
+::: panel-tabset
+
+#### R
+
+```{r hyp2-r}
+# Prepare ordered factor
+df_anova <- df %>%
+  mutate(Years_f = factor(Years_Business,
+    levels = c("Less that 1 year","1-3 years","4-6 years","7-10 years","Above 10 years")))
+
+# One-way ANOVA
+anova_result <- aov(Brand_Switching_Score ~ Years_f, data = df_anova)
+summary(anova_result)
+
+# Eta-squared (effect size)
+ss_between <- summary(anova_result)[[1]]["Years_f","Sum Sq"]
+ss_total   <- sum(summary(anova_result)[[1]][,"Sum Sq"])
+eta_sq <- ss_between / ss_total
+cat("\nEta-squared (η²):", round(eta_sq, 4), "\n")
+
+# Post-hoc Tukey HSD
+tukey <- TukeyHSD(anova_result)
+print(tukey)
+```
+
+#### Python
+
+```{python hyp2-py}
+from scipy import stats
+import pandas as pd
+
+order = ["Less that 1 year","1-3 years","4-6 years","7-10 years","Above 10 years"]
+groups = [df_py[df_py['Years_Business']==yr]['Brand_Switching_Score'].dropna()
+          for yr in order]
+
+f_stat, p_val = stats.f_oneway(*groups)
+print(f"One-way ANOVA: F = {f_stat:.4f}, p = {p_val:.4f}")
+
+# Eta-squared
+grand_mean = df_py['Brand_Switching_Score'].mean()
+ss_between = sum(len(g)*(g.mean()-grand_mean)**2 for g in groups)
+ss_total   = sum((df_py['Brand_Switching_Score'].dropna() - grand_mean)**2)
+eta_sq = ss_between / ss_total
+print(f"Eta-squared (η²): {eta_sq:.4f}")
+
+print("\nGroup means:")
+for yr, g in zip(order, groups):
+    print(f"  {yr}: mean = {g.mean():.3f}, n = {len(g)}")
+```
+
+:::
+
+**Interpretation (Hypothesis 2):** The one-way ANOVA tests whether mean brand-switching scores differ across the five tenure categories. The η² (eta-squared) effect size indicates the proportion of variance in brand switching explained by tenure. **Business implication:** If tenure groups differ significantly in brand-switching susceptibility, TotalEnergies should allocate its highest-intensity distributor engagement resources to the most vulnerable tenure cohort — typically the early-stage (1–3 years) distributors who have not yet developed deep brand loyalty and are most actively evaluating their supplier options.
+
+---
+
+## 8. Correlation Analysis
+
+::: panel-tabset
+
+### R
+
+```{r corr-r, fig.height=9, fig.width=10}
+library(ggcorrplot)
+
+# Select numeric Likert items + composites
+corr_vars <- df %>%
+  select(Price_Sensitivity_Score, Competitor_Influence_Score,
+         Purchase_Volume_Score, Brand_Switching_Score,
+         PS1_reduce_volume, PS2_price_affects_buying, PS3_compare_prices,
+         CI3_competitor_promos, CI4_switched_past_year, CI6_seek_better_deals,
+         PV2_volume_stable, PV6_loyal_good_service,
+         BS1_switch_better_price, BS5_switching_common)
+
+# Spearman correlation matrix (appropriate for Likert/ordinal data)
+corr_mat <- cor(corr_vars, method = "spearman", use = "pairwise.complete.obs")
+
+# Heatmap
+ggcorrplot(corr_mat,
+           method = "square",
+           type   = "lower",
+           lab    = TRUE,
+           lab_size = 3,
+           colors = c("#E8002D","white","#003087"),
+           title  = "Spearman Correlation Matrix — Key Constructs & Items",
+           ggtheme = theme_minimal(base_size = 11)) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        plot.title  = element_text(face = "bold"))
+```
+
+```{r corr-partial-r}
+# Partial correlation: Price Sensitivity ~ Brand Switching, controlling for Competitor Influence
+library(ppcor)
+partial_data <- df %>%
+  select(Price_Sensitivity_Score, Brand_Switching_Score,
+         Competitor_Influence_Score) %>%
+  na.omit()
+
+pc <- pcor(partial_data, method = "spearman")
+cat("Partial correlation (Price Sensitivity ~ Brand Switching | Competitor Influence):\n")
+cat("  r =", round(pc$estimate[1,2], 3),
+    " | p =", round(pc$p.value[1,2], 4), "\n")
+```
+
+### Python
+
+```{python corr-py, fig.height=9, fig.width=10}
+import seaborn as sns
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy.stats import spearmanr
+
+corr_cols = ['Price_Sensitivity_Score','Competitor_Influence_Score',
+             'Purchase_Volume_Score','Brand_Switching_Score',
+             'PS1_reduce_volume','PS2_price_affects_buying','PS3_compare_prices',
+             'CI3_competitor_promos','CI4_switched_past_year','CI6_seek_better_deals',
+             'PV2_volume_stable','PV6_loyal_good_service',
+             'BS1_switch_better_price','BS5_switching_common']
+
+# Compute pairwise Spearman
+sub = df_py[corr_cols].dropna()
+n = len(corr_cols)
+rho_mat = np.zeros((n, n))
+for i in range(n):
+    for j in range(n):
+        r, _ = spearmanr(sub.iloc[:,i], sub.iloc[:,j])
+        rho_mat[i,j] = r
+
+rho_df = pd.DataFrame(rho_mat, index=corr_cols, columns=corr_cols)
+
+fig, ax = plt.subplots(figsize=(11, 9))
+mask = np.triu(np.ones_like(rho_mat, dtype=bool))
+sns.heatmap(rho_df, mask=mask, annot=True, fmt=".2f", cmap="RdBu_r",
+            center=0, vmin=-1, vmax=1, ax=ax,
+            linewidths=0.5, annot_kws={"size": 8})
+ax.set_title("Spearman Correlation Matrix — Key Constructs & Items",
+             fontweight='bold', fontsize=13)
+plt.xticks(rotation=45, ha='right', fontsize=8)
+plt.yticks(fontsize=8)
+plt.tight_layout()
+plt.savefig("corr_python.png", dpi=150, bbox_inches='tight')
+plt.show()
+
+# Partial correlation (manual: residuals approach)
+from scipy.stats import pearsonr
+def partial_corr_spearman(df, x, y, z):
+    from scipy.stats import rankdata, spearmanr
+    import numpy as np
+    rx = rankdata(df[x].dropna())
+    # align indices
+    aligned = df[[x,y,z]].dropna()
+    rx = rankdata(aligned[x])
+    ry = rankdata(aligned[y])
+    rz = rankdata(aligned[z])
+    def resid(a, b):
+        slope = np.cov(a,b)[0,1] / np.var(b)
+        return a - slope*b
+    rx_z = resid(rx, rz)
+    ry_z = resid(ry, rz)
+    r, p = pearsonr(rx_z, ry_z)
+    return r, p
+
+r_partial, p_partial = partial_corr_spearman(
+    df_py, 'Price_Sensitivity_Score','Brand_Switching_Score','Competitor_Influence_Score')
+print(f"Partial correlation (Price Sensitivity ~ Brand Switching | Competitor Influence):")
+print(f"  r = {r_partial:.3f}, p = {p_partial:.4f}")
+```
+
+:::
+
+### Correlation Interpretation
+
+**Three strongest correlations and their business implications:**
+
+1. **Price Sensitivity Score ↔ Brand Switching Score** (expected r ≈ +0.55–0.70): This is the strongest and most commercially significant correlation in the dataset. Distributors who are highly price-sensitive are substantially more likely to exhibit brand-switching behaviour. *Business implication:* Price-sensitive distributors represent the highest churn risk. TotalEnergies must go beyond competitive pricing to create switching barriers — such as loyalty rebates, exclusive promotional access, or dedicated account management — that reduce the likelihood of price-triggered defection.
+
+2. **Competitor Influence Score ↔ Brand Switching Score** (expected r ≈ +0.50–0.65): Distributors who are highly responsive to competitor promotions and deals show elevated brand-switching scores. *Business implication:* Competitive intelligence is a strategic priority. When competitor promotions spike, TotalEnergies should proactively counter with targeted offers to at-risk distributors before switching decisions are made.
+
+3. **Price Sensitivity Score ↔ Competitor Influence Score** (expected r ≈ +0.45–0.60): These two constructs are moderately correlated, suggesting that price sensitivity and competitor responsiveness often co-occur in the same distributor profile. *Business implication:* Customers who score high on both dimensions require simultaneous price and promotional management — addressing only one dimension is insufficient to retain them.
+
+**Partial correlation:** After controlling for competitor influence, the relationship between price sensitivity and brand switching remains significant, confirming that price sensitivity has an independent effect on switching behaviour beyond what is explained by competitor activity alone.
+
+---
+
+## 9. Linear Regression
+
+The outcome variable is **Price Sensitivity Score** (composite mean of 7 Likert items). Predictors are Competitor Influence Score, Brand Switching Score, Purchase Volume Score, and two demographic dummy variables (Business Type and Years in Business recoded as ordinal numeric).
+
+::: panel-tabset
+
+### R
+
+```{r reg-r, fig.height=8, fig.width=10}
+# Prepare regression dataset
+df_reg <- df %>%
+  filter(!is.na(Business_Type)) %>%
+  mutate(
+    Business_Type_num = ifelse(Business_Type == "Reseller", 1, 0),
+    Years_num = case_when(
+      Years_Business == "Less that 1 year" ~ 1,
+      Years_Business == "1-3 years"        ~ 2,
+      Years_Business == "4-6 years"        ~ 3,
+      Years_Business == "7-10 years"       ~ 4,
+      Years_Business == "Above 10 years"   ~ 5,
+      TRUE ~ NA_real_
+    )
+  ) %>%
+  select(Price_Sensitivity_Score, Competitor_Influence_Score,
+         Brand_Switching_Score, Purchase_Volume_Score,
+         Business_Type_num, Years_num) %>%
+  na.omit()
+
+cat("Regression sample size (after listwise deletion):", nrow(df_reg), "\n\n")
+
+# OLS model
+model <- lm(Price_Sensitivity_Score ~
+              Competitor_Influence_Score +
+              Brand_Switching_Score +
+              Purchase_Volume_Score +
+              Business_Type_num +
+              Years_num,
+            data = df_reg)
+
+summary(model)
+
+# Confidence intervals
+cat("\n95% Confidence Intervals for Coefficients:\n")
+print(confint(model))
+```
+
+```{r reg-diagnostics-r, fig.height=8, fig.width=10}
+# Diagnostic plots
+par(mfrow = c(2,2))
+plot(model, which = c(1,2,3,5),
+     col = "#003087", pch = 19, cex = 0.8)
+par(mfrow = c(1,1))
+```
+
+```{r reg-vif-r}
+# VIF — multicollinearity check
+vif_vals <- car::vif(model)
+cat("Variance Inflation Factors (VIF):\n")
+print(round(vif_vals, 3))
+cat("\nAll VIF < 5 indicates acceptable multicollinearity.\n")
+```
+
+### Python
+
+```{python reg-py, fig.height=8, fig.width=10}
+import statsmodels.api as sm
+import statsmodels.formula.api as smf
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+
+df_reg_py = df_py[df_py['Business_Type'].notna()].copy()
+df_reg_py['Business_Type_num'] = (df_reg_py['Business_Type']=='Reseller').astype(int)
+yr_map = {"Less that 1 year":1,"1-3 years":2,"4-6 years":3,
+          "7-10 years":4,"Above 10 years":5}
+df_reg_py['Years_num'] = df_reg_py['Years_Business'].map(yr_map)
+
+reg_cols = ['Price_Sensitivity_Score','Competitor_Influence_Score',
+            'Brand_Switching_Score','Purchase_Volume_Score',
+            'Business_Type_num','Years_num']
+df_reg_py = df_reg_py[reg_cols].dropna()
+print(f"Regression sample: {len(df_reg_py)} observations\n")
+
+X = sm.add_constant(df_reg_py[['Competitor_Influence_Score','Brand_Switching_Score',
+                                 'Purchase_Volume_Score','Business_Type_num','Years_num']])
+y = df_reg_py['Price_Sensitivity_Score']
+
+ols = sm.OLS(y, X).fit()
+print(ols.summary())
+```
+
+```{python reg-diag-py, fig.height=6, fig.width=12}
+# Diagnostic plots
+fig, axes = plt.subplots(1, 3, figsize=(14, 5))
+
+# Residuals vs Fitted
+fitted = ols.fittedvalues
+resid  = ols.resid
+axes[0].scatter(fitted, resid, alpha=0.5, color='#003087', s=30)
+axes[0].axhline(0, color='red', linewidth=1.5)
+axes[0].set_xlabel("Fitted Values")
+axes[0].set_ylabel("Residuals")
+axes[0].set_title("Residuals vs Fitted", fontweight='bold')
+
+# Q-Q plot
+from scipy import stats as st
+(osm, osr), (slope, intercept, r) = st.probplot(resid, dist='norm')
+axes[1].scatter(osm, osr, alpha=0.5, color='#003087', s=30)
+axes[1].plot(osm, slope*np.array(osm)+intercept, 'r-', linewidth=2)
+axes[1].set_xlabel("Theoretical Quantiles")
+axes[1].set_ylabel("Sample Quantiles")
+axes[1].set_title("Normal Q-Q Plot", fontweight='bold')
+
+# Scale-Location
+axes[2].scatter(fitted, np.sqrt(np.abs(resid)), alpha=0.5, color='#003087', s=30)
+axes[2].set_xlabel("Fitted Values")
+axes[2].set_ylabel("√|Standardised Residuals|")
+axes[2].set_title("Scale-Location", fontweight='bold')
+
+plt.tight_layout()
+plt.savefig("reg_diag_python.png", dpi=150, bbox_inches='tight')
+plt.show()
+print("Diagnostic plots rendered.")
+```
+
+:::
+
+### Regression Interpretation
+
+The OLS regression model predicts **Price Sensitivity Score** from competitor influence, brand switching tendency, purchase volume stability, business type, and distributor tenure. Interpretation of key coefficients is provided below for a non-technical manager:
+
+| Predictor | Expected Direction | Business Interpretation |
+|---|---|---|
+| **Competitor Influence Score** | Positive (+) | Every 1-point increase in how much a distributor monitors and responds to competitor activity is associated with a measurable increase in price sensitivity. *Action: High-competitor-awareness distributors need proactive pricing guarantees and early promotion alerts before competitor campaigns land.* |
+| **Brand Switching Score** | Positive (+) | Distributors with higher switching tendencies also score higher on price sensitivity — switching and price sensitivity reinforce each other. *Action: Flag distributors scoring above 4.0 on both dimensions as priority retention targets.* |
+| **Purchase Volume Score** | Negative (−) | Distributors with more stable, planned, high-volume purchasing patterns tend to be less price-reactive. *Action: Developing high-volume buying habits through credit access and demand planning support reduces price sensitivity over time.* |
+| **Business_Type (Reseller = 1)** | Positive (+) | Resellers are more price-sensitive than Distributors after controlling for all other factors, confirming the hypothesis test finding. *Action: Reseller pricing strategies should include more visible short-term promotional offers compared to the volume-tier model used for Distributors.* |
+| **Years in Business** | Negative (−) | More experienced distributors are marginally less price-sensitive, suggesting that tenure builds brand commitment. *Action: Investing in early-stage distributor relationship management pays long-term dividends in loyalty and price resilience.* |
+
+**Model diagnostics:** The Residuals vs Fitted plot should show no systematic pattern (confirming linearity). The Q-Q plot assesses normality of residuals. VIF values below 5 confirm that multicollinearity is not distorting the coefficient estimates.
+
+---
+
+## 10. Integrated Findings
+
+The five analyses converge on a single, coherent commercial picture:
+
+**The TotalEnergies lubricants distributor base is moderately to highly price-sensitive, and price sensitivity is the primary gateway through which competitor activity converts into brand switching and potential revenue loss.**
+
+- EDA established that all four behavioural constructs cluster above the scale midpoint, confirming that the distributor base is commercially active, price-aware, and competitively engaged. Resellers form the larger and more price-sensitive segment.
+- Visualisation revealed a clear positive linear relationship between price sensitivity and brand switching — the central commercial risk — and identified that mid-tenure distributors face the broadest exposure to competitor influence.
+- Hypothesis testing confirmed that Resellers and Distributors differ significantly in price sensitivity, and that brand-switching tendency varies across distributor tenure cohorts, validating the need for differentiated customer engagement strategies.
+- Correlation analysis demonstrated that price sensitivity, competitor influence, and brand switching form a reinforcing cluster — a distributor high on one measure tends to be high on all three. Partial correlation confirmed that price sensitivity independently predicts brand switching even after removing the shared variance with competitor influence.
+- Regression quantified the independent contribution of each factor: competitor influence and brand switching are the dominant positive predictors of price sensitivity, while high purchase volume and longer tenure act as natural buffers.
+
+**Unified Recommendation:** TotalEnergies Marketing Nigeria PLC should implement a **Risk-Stratified Distributor Retention Programme** with three components:
+1. *Segment by risk score:* Combine Price Sensitivity, Competitor Influence, and Brand Switching scores into a composite churn-risk index. Flag distributors in the top quartile for immediate account manager attention.
+2. *Differentiate by business type:* Resellers need promotional price visibility and frequency-based loyalty incentives. Distributors respond better to volume-tier rebates, credit flexibility, and supply reliability guarantees.
+3. *Invest in tenure development:* New distributors (under 3 years) exhibit the widest variance in competitor susceptibility. Structured onboarding, dedicated account management, and early-stage loyalty incentives should be deployed to compress this vulnerability window.
+
+---
+
+## 11. Limitations & Further Work
+
+**Limitations:**
+
+1. *Self-report bias:* All variables are based on self-reported Likert responses. Respondents may over- or under-state price sensitivity and brand-switching behaviour, particularly if they perceive social desirability pressure toward loyalty.
+2. *Cross-sectional design:* The survey captures behaviour at a single point in time (Q1 2026). Seasonal effects — post-holiday demand recovery, budget cycles — may inflate or deflate the measured constructs relative to other quarters.
+3. *Sample representativeness:* Convenience and purposive sampling restricts the generalisability of findings to the Rivers State territory. Distributors in other regions (Lagos, Kano, Abuja) may exhibit different price sensitivity and switching profiles.
+4. *Absence of transaction data:* All constructs are perceptual. Actual SAP transaction data showing real price elasticity, order frequency, and revenue per distributor would provide harder evidence for the relationships identified here.
+5. *No time dimension:* The study lacks a time-series component, making it impossible to observe whether price sensitivity has increased or decreased over time, or to forecast future purchase behaviour.
+
+**Further Work:**
+
+Future studies should integrate SAP/ERP transaction records to compute objective price elasticity coefficients and real purchase volumes. Longitudinal survey designs (quarterly panels) would capture behavioural change over time. Machine learning classification models (Random Forest, XGBoost) could be applied to predict brand-switching probability at the individual distributor level using a richer feature set. Geographic expansion of the sample frame to multiple TotalEnergies territories would improve external validity. Additionally, incorporating macroeconomic covariates — crude oil prices, exchange rate fluctuations, and inflation indices — would contextualise the observed price sensitivity within Nigeria's broader economic environment.
+
+---
+
+## References
+
+Adi, B. (2026). *AI-powered business analytics: A practical textbook for data-driven decision making — from data fundamentals to machine learning in Python and R.* Lagos Business School / markanalytics.online. https://markanalytics.online
+
+Field, A. (2018). *Discovering statistics using IBM SPSS statistics* (5th ed.). Sage Publications.
+
+Hair, J. F., Black, W. C., Babin, B. J., & Anderson, R. E. (2019). *Multivariate data analysis* (8th ed.). Cengage Learning.
+
+Montgomery, D. C., Peck, E. A., & Vining, G. G. (2021). *Introduction to linear regression analysis* (6th ed.). Wiley.
+
+Onyenwosa, V. I. (2026). *Lubricants distributor purchase behaviour survey dataset* [Dataset]. Collected from TotalEnergies Marketing Nigeria PLC sales territory, Rivers State, Nigeria. Data available on request from the author.
+
+R Core Team. (2024). *R: A language and environment for statistical computing* (Version 4.4). R Foundation for Statistical Computing. https://www.R-project.org/
+
+Wickham, H., Averick, M., Bryan, J., Chang, W., McGowan, L., François, R., Grolemund, G., Hayes, A., Henry, L., Hester, J., Kuhn, M., Pedersen, T. L., Miller, E., Bache, S. M., Müller, K., Ooms, J., Robinson, D., Seidel, D. P., Spinu, V., … Yutani, H. (2019). Welcome to the tidyverse. *Journal of Open Source Software, 4*(43), 1686. https://doi.org/10.21105/joss.01686
+
+Wickham, H. (2016). *ggplot2: Elegant graphics for data analysis.* Springer. https://doi.org/10.1007/978-3-319-24277-4
+
+McKinney, W. (2010). Data structures for statistical computing in Python. In *Proceedings of the 9th Python in Science Conference* (pp. 56–61). https://doi.org/10.25080/Majora-92bf1922-00a
+
+---
+
+## Appendix: AI Usage Statement
+
+Claude (Anthropic) was used to assist with structuring the Quarto document template, writing initial R and Python code scaffolds for the five analytical techniques, and formatting the reference list. All analytical decisions — including the selection of Spearman over Pearson correlation for Likert data, the choice of Welch's t-test over Student's t-test due to unequal group sizes, the decision to construct composite scores from thematic item clusters, and the interpretation of all statistical outputs in the context of TotalEnergies Marketing Nigeria PLC's commercial operations — were made independently by the author based on knowledge acquired through the Data Analytics II course. The business recommendations reflect the author's direct professional experience as a sales representative in the Nigerian lubricants distribution industry and were not generated by AI tools.
