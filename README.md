@@ -1,5 +1,5 @@
 # Customer Purchase Behaviour Analytics
-## Evaluating Price Sensitivity & Competition in the Lubricants Market of TotalEnergies Marketing Nigeria PLC
+## Evaluating Price Sensitivity & Competition in the Lubricants Market of TotalEnergies Marketing Nigeria PLC 
 
 **Author:** Victory Ishioma Onyenwosa  
 **Course:** Data Analytics II — Lagos Business School  
